@@ -284,7 +284,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","H
 
 /* Bouton couches */
 #btn-layers{
-  position:absolute;right:16px;bottom:20px;z-index:700;
+  position:fixed;left:16px;bottom:20px;z-index:1300;
   width:46px;height:46px;border-radius:50%;
   background:#fff;border:1.5px solid #E2E8F0;
   color:#2B6CB0;cursor:pointer;
@@ -295,7 +295,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","H
 #btn-layers:hover{background:#EBF8FF;transform:translateY(-2px)}
 #btn-layers.actif{background:#2B6CB0;color:#fff}
 #panneau-layers{
-  position:absolute;right:16px;bottom:74px;z-index:700;
+  position:fixed;left:16px;bottom:74px;z-index:1300;
   width:260px;background:#fff;
   border:1px solid #E2E8F0;border-radius:14px;
   padding:14px 16px;box-shadow:0 10px 36px rgba(0,0,0,0.18);
@@ -369,7 +369,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","H
     <button class="btn-filtres" id="btn-ouvrir-filtres">
       <span class="filtre-icone">⚙</span>
       Filtres
-      <span class="filtre-badge" id="badge-filtres">6</span>
     </button>
   </div>
 </header>
@@ -1100,21 +1099,6 @@ document.querySelectorAll('.bascule-opt').forEach(btn => {
   });
 });
 
-/* --- Bouton couches flottant (bas gauche) --- */
-const btnLayers = document.getElementById('btn-layers');
-const panneauLayers = document.getElementById('panneau-layers');
-btnLayers.addEventListener('click', (e) => {
-  e.stopPropagation();
-  panneauLayers.classList.toggle('ouvert');
-  btnLayers.classList.toggle('actif');
-});
-document.addEventListener('click', (e) => {
-  if (!panneauLayers.contains(e.target) && e.target !== btnLayers && !btnLayers.contains(e.target)) {
-    panneauLayers.classList.remove('ouvert');
-    btnLayers.classList.remove('actif');
-  }
-});
-
 const statutEl = document.getElementById('couches-statut');
 const statutCouches = { arr: '...', cmq: '...', prov: '...' };
 function majStatut() {
@@ -1301,8 +1285,10 @@ function rafraichir() {
 
 /* ══ PANNEAU FILTRES FLOTTANT ══ */
 const overlayFiltres = document.getElementById('overlay-filtres');
-document.getElementById('btn-ouvrir-filtres').addEventListener('click', () => {
-  overlayFiltres.classList.add('ouvert');
+const btnOuvrirFiltres = document.getElementById('btn-ouvrir-filtres');
+btnOuvrirFiltres.addEventListener('click', (e) => {
+  e.stopPropagation();
+  overlayFiltres.classList.toggle('ouvert');
 });
 document.getElementById('btn-fermer-filtres').addEventListener('click', () => {
   overlayFiltres.classList.remove('ouvert');
@@ -1344,22 +1330,24 @@ document.querySelectorAll('.bascule-opt').forEach(btn => {
   });
 });
 
-/* ══ BOUTON COUCHES ══ */
-const btnLayersEl = document.getElementById('btn-layers');
-const panneauLayersEl = document.getElementById('panneau-layers');
-btnLayersEl.addEventListener('click', (e) => {
-  e.stopPropagation();
-  panneauLayersEl.classList.toggle('ouvert');
-  btnLayersEl.classList.toggle('actif');
-});
-document.addEventListener('click', (e) => {
-  if (!panneauLayersEl.contains(e.target) && e.target !== btnLayersEl) {
-    panneauLayersEl.classList.remove('ouvert');
-    btnLayersEl.classList.remove('actif');
-  }
-});
-
 /* ══ EXPORTS ══ */
+/* ── Bouton couches ── */
+(function() {
+  const btnL = document.getElementById('btn-layers');
+  const panL = document.getElementById('panneau-layers');
+  if (!btnL || !panL) return;
+  btnL.addEventListener('click', (e) => {
+    e.stopPropagation();
+    panL.classList.toggle('ouvert');
+    btnL.classList.toggle('actif');
+  });
+  document.addEventListener('click', (e) => {
+    if (!panL.contains(e.target) && e.target !== btnL) {
+      panL.classList.remove('ouvert');
+      btnL.classList.remove('actif');
+    }
+  });
+})();
 function donneesExport() {
   return reglementsCourants.map(r => ({
     Numero: r.reglement.numero||'', Titre: r.reglement.titre||'',
