@@ -3,1078 +3,485 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Règlements de construction — Ville de Québec</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<title>Règlements de construction — Région de Québec</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
-  :root {
-    --fond: #F1F4F8;
-    --panneau: #FFFFFF;
-    --encre: #1A2433;
-    --encre-doux: #5B6878;
-    --bordure: #DDE3EC;
-    --vert-qc: #1B3A5C;
-    --vert-clair: #4A7BA8;
-    --or: #2E6B9E;
-    --ombre: rgba(27, 58, 92, 0.10);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body {
-    height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    background: var(--fond);
-    color: var(--encre);
-    overflow: hidden;
-  }
-  #app { display: flex; flex-direction: column; height: 100vh; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;overflow:hidden;background:#EDF2F7}
 
-  /* ===== BARRE DU HAUT ===== */
-  #barre-haut {
-    display: flex; flex-direction: column;
-    background: var(--panneau);
-    box-shadow: 0 2px 18px rgba(27,58,92,0.10);
-    z-index: 1200; flex-shrink: 0;
-  }
-  .bh-rangee-1 {
-    display: flex; align-items: center; justify-content: space-between;
-    height: 68px; padding: 0 24px; gap: 18px;
-    background: linear-gradient(100deg, #15304F 0%, #1B3A5C 55%, #234a73 100%);
-    position: relative; overflow: hidden;
-  }
-  /* Léger motif lumineux décoratif */
-  .bh-rangee-1::after {
-    content: ''; position: absolute; top: -60%; right: -5%;
-    width: 380px; height: 280px;
-    background: radial-gradient(circle, rgba(143,180,212,0.16) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .bh-gauche { display: flex; align-items: center; gap: 16px; min-width: 0; z-index: 1; }
-  .bh-logos { display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
-  .bh-logo {
-    height: 44px; width: 72px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 8px; overflow: hidden;
-    background: #fff; padding: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-  }
-  .bh-logo img { max-height: 36px; max-width: 100%; object-fit: contain; }
-  .bh-logo.logo-vide { background: #fff; }
-  .bh-logo.logo-vide::after {
-    content: attr(data-label); font-size: 11px; font-weight: 800;
-    color: var(--vert-qc); letter-spacing: 0.5px;
-  }
-  .bh-titre { min-width: 0; border-left: 1px solid rgba(255,255,255,0.18); padding-left: 16px; }
-  .bh-surtitre {
-    font-size: 9.5px; letter-spacing: 2px; text-transform: uppercase;
-    color: #8FB4D4; font-weight: 700;
-  }
-  .bh-nom {
-    font-size: 15.5px; font-weight: 700; color: #fff;
-    line-height: 1.2; margin-top: 3px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .bh-centre { flex: 1; display: flex; justify-content: center; max-width: 520px; z-index: 1; }
-  .recherche-haut {
-    width: 100%; max-width: 480px;
-    background: rgba(255,255,255,0.12);
-    border: 1.5px solid rgba(255,255,255,0.22);
-    border-radius: 24px; display: flex; align-items: center;
-    padding: 0 18px; height: 42px; transition: all 0.22s;
-    backdrop-filter: blur(4px);
-  }
-  .recherche-haut:focus-within {
-    background: #fff; border-color: #fff;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.2);
-  }
-  .recherche-haut .loupe { color: #cdd9e8; font-size: 16px; margin-right: 10px; transition: color 0.2s; }
-  .recherche-haut:focus-within .loupe { color: var(--vert-clair); }
-  .recherche-haut input {
-    border: none; background: transparent; outline: none;
-    font-size: 13.5px; color: #fff; width: 100%;
-    font-family: inherit;
-  }
-  .recherche-haut input::placeholder { color: #b8c8db; }
-  .recherche-haut:focus-within input { color: var(--encre); }
-  .recherche-haut:focus-within input::placeholder { color: var(--encre-doux); }
-  .bh-droite { flex-shrink: 0; z-index: 1; }
+/* ── BARRE DU HAUT ─────────────────────────────── */
+#barre-haut{
+  position:fixed;top:0;left:0;right:0;z-index:1200;
+  height:62px;
+  background:rgba(255,255,255,0.96);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(0,0,0,0.08);
+  box-shadow:0 2px 20px rgba(0,0,0,0.07);
+  display:flex;align-items:center;padding:0 20px;gap:14px;
+}
+.bh-logos{display:flex;align-items:center;gap:10px}
+.bh-logo{
+  height:44px;width:80px;border-radius:10px;overflow:hidden;
+  background:#fff;border:1px solid #E2E8F0;
+  display:flex;align-items:center;justify-content:center;padding:5px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+}
+.bh-logo img{max-height:34px;max-width:100%;object-fit:contain}
+.bh-logo.logo-vide{background:#F8FAFC}
+.bh-logo.logo-vide::after{content:attr(data-label);font-size:12px;font-weight:800;color:#2D3748;letter-spacing:0.5px}
+.bh-sep{width:1px;height:32px;background:#E2E8F0}
+.bh-titre{min-width:0}
+.bh-surtitre{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#718096;font-weight:700}
+.bh-nom{font-size:15px;font-weight:700;color:#1A202C;line-height:1.2;margin-top:2px;white-space:nowrap}
+.bh-droite{display:flex;align-items:center;gap:10px;margin-left:auto}
+.bh-recherche{
+  display:flex;align-items:center;gap:8px;
+  background:#F7FAFC;border:1.5px solid #E2E8F0;
+  border-radius:22px;padding:0 16px;height:38px;width:300px;
+  transition:all 0.2s;
+}
+.bh-recherche:focus-within{border-color:#4299E1;background:#fff;box-shadow:0 0 0 3px rgba(66,153,225,0.15)}
+.bh-recherche .loupe{color:#A0AEC0;font-size:15px}
+.bh-recherche input{border:none;background:transparent;outline:none;font-size:13px;color:#2D3748;width:100%;font-family:inherit}
+.bh-recherche input::placeholder{color:#A0AEC0}
+.bascule{
+  display:flex;background:#F7FAFC;
+  border:1.5px solid #E2E8F0;border-radius:22px;padding:3px;gap:2px;
+}
+.bascule-opt{
+  border:none;background:transparent;cursor:pointer;
+  padding:7px 18px;border-radius:18px;
+  font-size:13px;font-weight:600;color:#718096;
+  font-family:inherit;transition:all 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+.bascule-opt.actif{background:#2B6CB0;color:#fff;box-shadow:0 2px 8px rgba(43,108,176,0.3)}
+.bascule-opt:not(.actif):hover{color:#2B6CB0}
+.btn-filtres{
+  display:flex;align-items:center;gap:8px;
+  background:#2B6CB0;color:#fff;border:none;
+  border-radius:22px;padding:9px 18px;cursor:pointer;
+  font-size:13px;font-weight:700;font-family:inherit;
+  transition:all 0.2s;box-shadow:0 2px 8px rgba(43,108,176,0.35);
+}
+.btn-filtres:hover{background:#2C5282;transform:translateY(-1px);box-shadow:0 4px 14px rgba(43,108,176,0.4)}
+.btn-filtres .filtre-icone{font-size:16px}
+.btn-filtres .filtre-badge{
+  background:rgba(255,255,255,0.3);color:#fff;
+  font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;
+}
 
-  /* ===== BASCULE CARTE / LISTE ===== */
-  .bascule {
-    display: flex; background: rgba(255,255,255,0.14);
-    border: 1.5px solid rgba(255,255,255,0.22); border-radius: 24px;
-    padding: 3px; gap: 2px;
-  }
-  .bascule-opt {
-    border: none; background: transparent; cursor: pointer;
-    padding: 7px 22px; border-radius: 20px;
-    font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.78);
-    font-family: inherit; transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
-  }
-  .bascule-opt.actif {
-    background: #fff; color: var(--vert-qc);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.22);
-  }
-  .bascule-opt:not(.actif):hover { color: #fff; }
+/* ── CORPS ─────────────────────────────────────── */
+#corps{position:fixed;top:62px;left:0;right:0;bottom:0;}
 
-  /* ===== RANGÉE 2 : BARRE DE FILTRES HORIZONTALE ===== */
-  .bh-rangee-2 {
-    display: flex; align-items: center; gap: 16px;
-    padding: 12px 24px 6px; background: transparent;
-    flex-wrap: wrap;
-  }
-  .bh-rangee-3 {
-    display: flex; align-items: flex-start; gap: 16px;
-    padding: 6px 24px 14px; background: transparent;
-    flex-wrap: wrap;
-  }
-  .bf-groupe { display: flex; align-items: center; gap: 10px; }
-  .bf-label {
-    font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase;
-    color: var(--encre-doux); font-weight: 700; flex-shrink: 0;
-    padding-top: 9px;
-  }
-  .bf-sep { width: 1px; height: 28px; background: var(--bordure); }
+/* ── VUES ──────────────────────────────────────── */
+.vue{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity 0.3s ease}
+.vue.active{opacity:1;visibility:visible}
+#carte{width:100%;height:100%}
+.leaflet-container{background:#DDE6F0}
 
-  /* ===== CASCADE GÉOGRAPHIQUE (fil d'Ariane) ===== */
-  .cascade-geo {
-    display: flex; align-items: stretch; flex-wrap: wrap; gap: 4px;
-    background: var(--panneau); border: 1px solid var(--bordure);
-    border-radius: 12px; padding: 6px 8px;
-    box-shadow: 0 2px 8px rgba(27,58,92,0.06);
-  }
-  .cg-niveau {
-    display: flex; flex-direction: column; gap: 2px;
-    padding: 3px 8px; border-radius: 8px; transition: background 0.2s;
-  }
-  .cg-niveau:hover { background: var(--fond); }
-  .cg-titre {
-    font-size: 8.5px; letter-spacing: 0.8px; text-transform: uppercase;
-    color: var(--vert-clair); font-weight: 700; padding-left: 2px;
-  }
-  .cg-select {
-    border: none; background: transparent; outline: none;
-    font-size: 13px; font-weight: 600; color: var(--vert-qc);
-    font-family: inherit; cursor: pointer; padding: 0 2px;
-    max-width: 230px;
-  }
-  .cg-fleche {
-    display: flex; align-items: center; color: var(--bordure);
-    font-size: 18px; font-weight: 400;
-  }
+/* ── VUE LISTE ─────────────────────────────────── */
+#vue-liste{display:flex;flex-direction:column;background:#F7FAFC}
+.liste-entete{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;background:#fff;
+  border-bottom:1px solid #E2E8F0;flex-shrink:0;
+}
+#liste-compte{font-size:14px;font-weight:700;color:#2B6CB0}
+.liste-hint{font-size:11px;color:#A0AEC0}
+.tableau-conteneur{flex:1;overflow-y:auto}
+.tableau-conteneur::-webkit-scrollbar{width:8px}
+.tableau-conteneur::-webkit-scrollbar-thumb{background:#CBD5E0;border-radius:4px}
+#tableau{width:100%;border-collapse:collapse;background:#fff}
+#tableau thead th{
+  position:sticky;top:0;z-index:5;
+  background:#2B6CB0;color:#fff;
+  text-align:left;padding:12px 16px;
+  font-size:12px;font-weight:700;letter-spacing:0.3px;
+  cursor:pointer;user-select:none;
+  border-right:1px solid rgba(255,255,255,0.15);
+  transition:background 0.15s;
+}
+#tableau thead th:hover{background:#2C5282}
+#tableau thead th::after{content:" ⇅";opacity:0.4;font-size:10px}
+#tableau thead th.tri-asc::after{content:" ↑";opacity:1}
+#tableau thead th.tri-desc::after{content:" ↓";opacity:1}
+#tableau tbody tr{border-bottom:1px solid #EDF2F7;cursor:pointer;transition:background 0.15s}
+#tableau tbody tr:nth-child(even){background:#F7FAFC}
+#tableau tbody tr:hover{background:#EBF8FF}
+#tableau td{padding:11px 16px;font-size:12.5px;vertical-align:top}
+.td-numero{font-weight:700;color:#2B6CB0;white-space:nowrap}
+.badge-type{display:inline-block;padding:3px 9px;border-radius:5px;font-size:10.5px;font-weight:700;color:#fff}
+.badge-them{display:inline-flex;align-items:center;gap:7px;font-size:12px}
+.badge-them .pastille{width:11px;height:11px;border-radius:3px;flex-shrink:0}
 
-  .puces-themes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  /* Puce de thématique cliquable — pleine, arrondie, aérée */
-  .puce-theme {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 8px 15px 8px 12px; border-radius: 22px;
-    font-size: 12.5px; font-weight: 600; cursor: pointer;
-    border: 1.5px solid transparent; user-select: none;
-    transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
-    position: relative;
-    box-shadow: 0 2px 8px rgba(27,58,92,0.12);
-  }
-  .puce-theme .pt-pastille {
-    width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0;
-    transition: transform 0.2s;
-  }
-  .puce-theme .pt-compte {
-    font-size: 11px; font-weight: 700; opacity: 0.78;
-    background: rgba(255,255,255,0.22); padding: 1px 7px; border-radius: 9px;
-  }
-  .puce-theme.active { color: #fff; }
-  .puce-theme:not(.active) {
-    background: var(--panneau); color: var(--encre-doux);
-    border-color: var(--bordure); box-shadow: none;
-  }
-  .puce-theme:not(.active) .pt-pastille { opacity: 0.4; }
-  .puce-theme:not(.active) .pt-compte { background: var(--fond); opacity: 0.9; }
-  .puce-theme:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(27,58,92,0.22); }
-  .puce-theme.active:hover .pt-pastille { transform: scale(1.15); }
+/* ── PANNEAU FILTRES FLOTTANT (droite) ─────────── */
+#overlay-filtres{
+  position:fixed;inset:0;z-index:1100;
+  background:rgba(0,0,0,0);pointer-events:none;
+  transition:background 0.3s;
+}
+#overlay-filtres.ouvert{background:rgba(0,0,0,0.18);pointer-events:all}
+#panneau-filtres{
+  position:absolute;top:0;right:0;bottom:0;width:360px;
+  background:#fff;
+  box-shadow:-8px 0 40px rgba(0,0,0,0.14);
+  transform:translateX(100%);
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+#overlay-filtres.ouvert #panneau-filtres{transform:translateX(0)}
+.pf-entete{
+  padding:18px 20px 14px;
+  border-bottom:1px solid #EDF2F7;flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.pf-titre{font-size:16px;font-weight:700;color:#1A202C}
+.pf-fermer{
+  width:32px;height:32px;border-radius:50%;
+  border:1.5px solid #E2E8F0;background:#F7FAFC;
+  color:#718096;cursor:pointer;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+}
+.pf-fermer:hover{background:#EDF2F7;color:#2D3748}
+.pf-corps{flex:1;overflow-y:auto;padding:8px 0 20px}
+.pf-corps::-webkit-scrollbar{width:6px}
+.pf-corps::-webkit-scrollbar-thumb{background:#CBD5E0;border-radius:4px}
+.pf-section{padding:14px 20px;border-bottom:1px solid #EDF2F7}
+.pf-section-titre{
+  font-size:10px;letter-spacing:1.3px;text-transform:uppercase;
+  color:#A0AEC0;font-weight:700;margin-bottom:10px;
+}
 
-  /* Puces en mode vertical (panneau gauche) */
-  .puces-v .puce-theme {
-    display: flex; width: 100%; border-radius: 12px;
-    padding: 10px 13px; gap: 9px;
-  }
-  .puces-v .puce-theme .pt-nom { flex: 1; line-height: 1.25; }
-  .puces-v .puce-theme:hover { transform: translateX(2px); }
-  .puce-theme .pt-info {
-    width: 16px; height: 16px; border-radius: 50%;
-    border: 1px solid currentColor; font-size: 10px;
-    display: inline-flex; align-items: center; justify-content: center;
-    opacity: 0.6; font-style: italic; margin-left: 1px;
-  }
-  /* Infobulle à gauche de la puce */
-  .pt-bulle {
-    position: absolute; bottom: calc(100% + 10px); left: 0;
-    width: 280px; background: var(--vert-qc); color: #fff;
-    padding: 13px 15px; border-radius: 10px;
-    font-size: 12px; font-weight: 400; line-height: 1.5;
-    box-shadow: 0 10px 32px rgba(27,58,92,0.32);
-    opacity: 0; visibility: hidden; transform: translateY(6px) scale(0.97);
-    transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
-    z-index: 2000; text-transform: none; letter-spacing: 0;
-  }
-  .pt-bulle::after {
-    content: ''; position: absolute; top: 100%; left: 22px;
-    border: 7px solid transparent; border-top-color: var(--vert-qc);
-  }
-  .pt-bulle-titre { font-weight: 700; font-size: 12.5px; margin-bottom: 5px; display: block; }
-  .puce-theme .pt-info:hover + .pt-bulle { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+/* Bouton reinit dans le panneau */
+#btn-reinit{
+  margin:14px 20px 0;width:calc(100% - 40px);
+  padding:10px;border-radius:10px;
+  border:1.5px solid #E2E8F0;background:#F7FAFC;
+  color:#4A5568;font-family:inherit;
+  font-size:12.5px;font-weight:600;cursor:pointer;
+  transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+#btn-reinit:hover{background:#EBF8FF;border-color:#90CDF4;color:#2B6CB0}
 
-  .bf-select {
-    border: 1.5px solid var(--bordure); border-radius: 8px;
-    padding: 7px 12px; font-size: 12.5px; color: var(--encre);
-    background: var(--panneau); font-family: inherit; cursor: pointer;
-    transition: border-color 0.2s;
-  }
-  .bf-select:hover { border-color: var(--vert-clair); }
-  .bf-menu-btn {
-    display: inline-flex; align-items: center;
-    border: 1.5px solid var(--bordure); border-radius: 8px;
-    padding: 7px 13px; font-size: 12.5px; font-weight: 600;
-    color: var(--vert-qc); background: var(--panneau);
-    cursor: pointer; font-family: inherit; transition: all 0.2s;
-  }
-  .bf-menu-btn:hover { border-color: var(--vert-clair); background: var(--fond); }
-  .bf-groupe { position: relative; }
-  .bf-menu {
-    position: absolute; top: calc(100% + 8px); left: 0; z-index: 1500;
-    width: 256px; background: var(--panneau);
-    border: 1px solid var(--bordure); border-radius: 12px;
-    padding: 13px 15px; box-shadow: 0 10px 34px rgba(27,58,92,0.2);
-    opacity: 0; visibility: hidden; transform: translateY(8px);
-    transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
-  }
-  .bf-menu.ouvert { opacity: 1; visibility: visible; transform: translateY(0); }
-  .bf-actions { display: flex; gap: 6px; margin-left: auto; }
+/* Cascade geo dans le panneau */
+.cascade-v{display:flex;flex-direction:column}
+.cv-niveau{
+  display:flex;flex-direction:column;gap:3px;
+  background:#F7FAFC;border:1px solid #E2E8F0;
+  border-radius:10px;padding:9px 12px;transition:border-color 0.2s;
+}
+.cv-niveau:hover{border-color:#90CDF4}
+.cv-titre{display:flex;align-items:center;font-size:8.5px;letter-spacing:0.8px;text-transform:uppercase;color:#4299E1;font-weight:700}
+.cv-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:15px;height:15px;border-radius:50%;
+  background:#4299E1;color:#fff;
+  font-size:9px;font-weight:700;margin-right:6px;
+}
+.cv-select{
+  border:none;background:transparent;outline:none;
+  font-size:13px;font-weight:600;color:#2D3748;
+  font-family:inherit;cursor:pointer;width:100%;
+}
+.cv-lien{width:2px;height:12px;margin-left:18px;background:#E2E8F0}
 
-  /* ===== CORPS ===== */
-  #corps { flex: 1; display: flex; min-height: 0; position: relative; }
+/* Thématiques avec icônes */
+.themes-grille{display:flex;flex-direction:column;gap:8px}
+.theme-card{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 14px;border-radius:12px;cursor:pointer;
+  border:2px solid transparent;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);
+  user-select:none;
+}
+.theme-card.active{border-color:transparent;transform:none}
+.theme-card:not(.active){background:#F7FAFC!important;border-color:#E2E8F0;opacity:0.6}
+.theme-card:hover{transform:translateX(3px);box-shadow:0 3px 12px rgba(0,0,0,0.1)}
+.theme-icone{font-size:22px;flex-shrink:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:rgba(255,255,255,0.6)}
+.theme-info{flex:1;min-width:0}
+.theme-nom{font-size:12.5px;font-weight:700;color:#2D3748;line-height:1.25}
+.theme-compte{font-size:11px;font-weight:700;margin-top:2px;opacity:0.7}
+.theme-check{
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid rgba(255,255,255,0.7);
+  background:rgba(255,255,255,0.4);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:11px;color:#fff;font-weight:700;
+  transition:all 0.15s;
+}
+.theme-card.active .theme-check::before{content:"✓"}
 
-  /* ===== PANNEAU DE GAUCHE ===== */
-  #panneau-gauche {
-    width: 300px; flex-shrink: 0;
-    background: var(--panneau);
-    border-right: 1px solid var(--bordure);
-    overflow-y: auto; padding: 8px 0;
-    box-shadow: 2px 0 14px rgba(27,58,92,0.05);
-    z-index: 500;
-  }
-  #panneau-gauche::-webkit-scrollbar { width: 7px; }
-  #panneau-gauche::-webkit-scrollbar-thumb { background: var(--bordure); border-radius: 4px; }
-  .pg-section { border-bottom: 1px solid var(--bordure); }
-  .pg-titre-section {
-    width: 100%; display: flex; align-items: center; justify-content: space-between;
-    background: transparent; border: none; cursor: pointer;
-    padding: 16px 20px; font-family: inherit;
-    font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase;
-    color: var(--vert-qc); font-weight: 700;
-    transition: background 0.18s;
-  }
-  .pg-titre-section:hover { background: var(--fond); }
-  .pg-chevron { font-size: 11px; color: var(--vert-clair); transition: transform 0.28s; }
-  .pg-titre-section.replie .pg-chevron { transform: rotate(-90deg); }
-  .pg-contenu {
-    max-height: 0; overflow: hidden;
-    transition: max-height 0.32s cubic-bezier(0.4,0,0.2,1);
-  }
-  .pg-contenu.ouvert { max-height: 700px; }
-  .pg-contenu > * { padding: 0 20px; }
-  .pg-contenu > *:last-child { padding-bottom: 18px; }
+/* Sélection active */
+.sel-active{
+  margin:4px 0;padding:14px;
+  background:linear-gradient(135deg,#1A365D,#2B6CB0);
+  border-radius:12px;color:#fff;
+}
+.sel-titre{font-size:9.5px;letter-spacing:1.3px;text-transform:uppercase;color:#90CDF4;font-weight:700;margin-bottom:8px}
+.sel-geo{font-size:12px;font-weight:600;line-height:1.4;margin-bottom:4px}
+.sel-themes{font-size:11px;color:#BEE3F8;line-height:1.4;margin-bottom:8px}
+.sel-compte{font-size:11px;color:#BEE3F8;padding-top:8px;border-top:1px solid rgba(255,255,255,0.15)}
+.sel-compte strong{color:#fff;font-size:15px}
 
-  /* Cascade géographique verticale */
-  .cascade-v { display: flex; flex-direction: column; }
-  .cv-niveau {
-    display: flex; flex-direction: column; gap: 4px;
-    background: var(--fond); border: 1px solid var(--bordure);
-    border-radius: 9px; padding: 9px 12px;
-    transition: border-color 0.2s;
-  }
-  .cv-niveau:hover { border-color: var(--vert-clair); }
-  .cv-titre {
-    font-size: 8.5px; letter-spacing: 0.8px; text-transform: uppercase;
-    color: var(--vert-clair); font-weight: 700;
-  }
-  .cv-select {
-    border: none; background: transparent; outline: none;
-    font-size: 13px; font-weight: 600; color: var(--vert-qc);
-    font-family: inherit; cursor: pointer; width: 100%;
-  }
-  .cv-lien {
-    width: 2px; height: 14px; margin-left: 18px;
-    background: var(--bordure);
-  }
+/* Export */
+.pf-titre-export{font-size:10px;letter-spacing:1.1px;text-transform:uppercase;color:#A0AEC0;font-weight:700;margin-bottom:8px}
+.export-boutons{display:flex;gap:7px}
+.export-btn{
+  flex:1;padding:9px 0;border-radius:9px;
+  border:1.5px solid #E2E8F0;background:#fff;
+  color:#2B6CB0;font-family:inherit;
+  font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;
+}
+.export-btn:hover{background:#2B6CB0;color:#fff;border-color:#2B6CB0;transform:translateY(-1px)}
 
-  /* Thématiques en pastilles verticales */
-  .puces-v { display: flex; flex-direction: column; gap: 7px; }
+/* Légende sur la carte */
+.legende{
+  position:absolute;bottom:20px;left:20px;
+  background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);
+  border-radius:14px;padding:14px 16px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.15);
+  z-index:600;max-width:240px;
+}
+.legende-titre{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:#718096;font-weight:700;margin-bottom:10px}
+.leg-item{margin:3px 0}
+.leg-ligne{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:11.5px;position:relative}
+.leg-icone{font-size:14px;width:20px;text-align:center;flex-shrink:0}
+.leg-nom{flex:1;line-height:1.3;color:#2D3748}
+.leg-aide{
+  width:18px;height:18px;border-radius:50%;flex-shrink:0;
+  border:1.5px solid #CBD5E0;background:#fff;
+  color:#A0AEC0;font-size:11px;font-weight:700;cursor:help;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;
+}
+.leg-aide:hover{border-color:#4299E1;color:#fff;background:#4299E1}
+.leg-def{
+  position:absolute;bottom:calc(100% + 8px);left:0;
+  width:230px;background:#1A202C;color:#fff;
+  padding:11px 13px;border-radius:10px;
+  font-size:11px;line-height:1.5;
+  box-shadow:0 8px 24px rgba(0,0,0,0.25);
+  opacity:0;visibility:hidden;transform:translateY(6px) scale(0.97);
+  transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  z-index:3000;pointer-events:none;
+}
+.leg-def::after{content:"";position:absolute;top:100%;left:22px;border:6px solid transparent;border-top-color:#1A202C}
+.leg-aide:hover + .leg-def{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+.legende-note{font-size:10px;color:#A0AEC0;margin-top:10px;padding-top:10px;border-top:1px solid #EDF2F7;line-height:1.4}
 
-  /* Bouton réinitialiser */
-  #btn-reinit {
-    margin: 12px 16px 4px; width: calc(100% - 32px);
-    padding: 9px; border-radius: 9px;
-    border: 1px solid var(--bordure); background: var(--fond);
-    color: var(--encre-doux); font-family: inherit;
-    font-size: 12px; font-weight: 600; cursor: pointer;
-    transition: all 0.2s;
-  }
-  #btn-reinit:hover { background: var(--vert-qc); color: #fff; border-color: var(--vert-qc); }
+/* Marqueurs */
+.marqueur-pin{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-family:inherit;color:#fff;
+  border-radius:50% 50% 50% 0;transform:rotate(-45deg);
+  border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  transition:all 0.15s;
+}
+.marqueur-pin span{transform:rotate(45deg);font-size:inherit}
+.marqueur-pin:hover{transform:rotate(-45deg) scale(1.12)}
 
-  /* Recherche dans le panneau */
-  .pg-recherche {
-    margin: 6px 16px 12px; padding: 0 13px; height: 38px;
-    background: var(--fond); border: 1.5px solid var(--bordure);
-    border-radius: 9px; display: flex; align-items: center;
-    transition: all 0.2s;
-  }
-  .pg-recherche:focus-within { border-color: var(--vert-clair); background: var(--panneau); }
-  .pg-recherche .loupe { color: var(--encre-doux); font-size: 15px; margin-right: 9px; }
-  .pg-recherche input {
-    border: none; background: transparent; outline: none;
-    font-size: 13px; color: var(--encre); width: 100%; font-family: inherit;
-  }
+/* Bouton couches */
+#btn-layers{
+  position:absolute;right:16px;bottom:20px;z-index:700;
+  width:46px;height:46px;border-radius:50%;
+  background:#fff;border:1.5px solid #E2E8F0;
+  color:#2B6CB0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,0.12);
+  transition:all 0.2s;
+}
+#btn-layers:hover{background:#EBF8FF;transform:translateY(-2px)}
+#btn-layers.actif{background:#2B6CB0;color:#fff}
+#panneau-layers{
+  position:absolute;right:16px;bottom:74px;z-index:700;
+  width:260px;background:#fff;
+  border:1px solid #E2E8F0;border-radius:14px;
+  padding:14px 16px;box-shadow:0 10px 36px rgba(0,0,0,0.18);
+  opacity:0;visibility:hidden;transform:translateY(8px) scale(0.97);
+  transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
+#panneau-layers.ouvert{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+.pl-titre{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#4299E1;font-weight:700;margin-bottom:11px}
+.couche-ligne{margin:6px 0}
+.couche-ligne label{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:12.5px;color:#2D3748}
+.couche-trait-couleur{display:inline-block;width:20px;height:4px;border-radius:2px}
+.interrupteur{cursor:pointer;width:15px;height:15px;accent-color:#2B6CB0}
 
-  /* Numéros de la cascade */
-  .cv-num {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 15px; height: 15px; border-radius: 50%;
-    background: var(--vert-clair); color: #fff;
-    font-size: 9px; font-weight: 700; margin-right: 6px;
-  }
-  .cv-titre { display: flex; align-items: center; }
+/* Panneau détail */
+#detail{
+  position:absolute;top:18px;right:18px;z-index:1000;
+  width:340px;background:#fff;border-radius:16px;
+  box-shadow:0 12px 48px rgba(0,0,0,0.18);
+  display:none;overflow:hidden;max-height:calc(100vh - 100px);
+  animation:glisser-detail 0.28s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes glisser-detail{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+#detail.visible{display:block}
+.detail-entete{padding:18px 20px 14px;background:linear-gradient(135deg,#1A365D,#2B6CB0);color:#fff;position:relative}
+.fermer{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.15);color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.fermer:hover{background:rgba(255,255,255,0.3)}
+.d-surtitre{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#BEE3F8;margin-bottom:5px}
+#detail-titre{font-size:16px;font-weight:700;line-height:1.25;padding-right:32px}
+.d-meta{margin-top:8px;font-size:11.5px;color:#BEE3F8}
+.detail-corps{padding:16px 20px;overflow-y:auto;max-height:400px}
+.detail-corps::-webkit-scrollbar{width:6px}
+.detail-corps::-webkit-scrollbar-thumb{background:#CBD5E0;border-radius:4px}
 
-  /* Petit texte d'aide */
-  .pg-aide {
-    font-size: 11px; color: var(--encre-doux); line-height: 1.4;
-    margin-bottom: 10px; font-style: italic;
-  }
+/* Chargement */
+.charge{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:800;background:#fff;border-radius:22px;padding:9px 18px;font-size:13px;font-weight:600;color:#4A5568;box-shadow:0 4px 16px rgba(0,0,0,0.12);border:1px solid #E2E8F0}
 
-  /* Bloc Sélection active */
-  .sel-active {
-    margin: 14px 0; padding: 14px;
-    background: linear-gradient(150deg, #15304F, #234a73);
-    border-radius: 11px; color: #fff;
-  }
-  .sel-titre {
-    font-size: 9.5px; letter-spacing: 1.4px; text-transform: uppercase;
-    color: #8FB4D4; font-weight: 700; margin-bottom: 9px;
-  }
-  .sel-geo { font-size: 12px; font-weight: 600; line-height: 1.4; margin-bottom: 5px; }
-  .sel-themes { font-size: 11px; color: #cdd9e8; line-height: 1.4; margin-bottom: 9px; }
-  .sel-compte {
-    font-size: 11px; color: #cdd9e8; padding-top: 9px;
-    border-top: 1px solid rgba(255,255,255,0.15);
-  }
-  .sel-compte strong { color: #fff; font-size: 15px; }
-
-  /* Export */
-  .pg-export { border-bottom: none; }
-  .pg-titre-export {
-    font-size: 10px; letter-spacing: 1.1px; text-transform: uppercase;
-    color: var(--encre-doux); font-weight: 700; margin: 14px 0 9px;
-  }
-  .export-boutons { display: flex; gap: 7px; padding-bottom: 18px; }
-  .export-btn {
-    flex: 1; padding: 9px 0; border-radius: 8px;
-    border: 1px solid var(--bordure); background: var(--panneau);
-    color: var(--vert-qc); font-family: inherit;
-    font-size: 12px; font-weight: 700; cursor: pointer;
-    transition: all 0.2s;
-  }
-  .export-btn:hover { background: var(--vert-clair); color: #fff; border-color: var(--vert-clair); transform: translateY(-1px); }
-
-  /* ===== ZONE CENTRALE & VUES ===== */
-  #zone-centrale {
-    flex: 1; position: relative; min-width: 0;
-    background: linear-gradient(135deg, #EAF0F6 0%, #DDE6F0 100%);
-  }
-  .vue {
-    position: absolute; inset: 0;
-    opacity: 0; visibility: hidden;
-    transition: opacity 0.3s ease;
-  }
-  .vue.active { opacity: 1; visibility: visible; }
-  #carte { width: 100%; height: 100%; }
-
-  /* ===== BOUTON COUCHES FLOTTANT (bas gauche) ===== */
-  #btn-layers {
-    position: absolute; left: 16px; bottom: 16px; z-index: 700;
-    width: 50px; height: 50px; border-radius: 50%;
-    background: var(--vert-clair); border: 3px solid #fff;
-    color: #fff; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 16px rgba(27,58,92,0.28);
-    transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  #btn-layers:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 6px 20px rgba(27,58,92,0.38); }
-  #btn-layers.actif { background: var(--vert-qc); }
-  #panneau-layers {
-    position: absolute; left: 16px; bottom: 78px; z-index: 700;
-    width: 270px; background: var(--panneau);
-    border: 1px solid var(--bordure); border-radius: 12px;
-    padding: 14px 16px; box-shadow: 0 8px 30px rgba(27,58,92,0.22);
-    opacity: 0; visibility: hidden; transform: translateY(8px) scale(0.97);
-    transition: all 0.24s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  #panneau-layers.ouvert { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
-  .pl-titre {
-    font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase;
-    color: var(--vert-clair); font-weight: 700; margin-bottom: 11px;
-  }
-
-  /* ===== VUE LISTE / TABLEAU ===== */
-  #vue-liste { display: flex; flex-direction: column; background: var(--fond); }
-  .liste-entete {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 22px; background: var(--panneau);
-    border-bottom: 1px solid var(--bordure); flex-shrink: 0;
-  }
-  #liste-compte { font-size: 14px; font-weight: 700; color: var(--vert-qc); }
-  .liste-hint { font-size: 11px; color: var(--encre-doux); }
-  .tableau-conteneur { flex: 1; overflow-y: auto; padding: 0; }
-  .tableau-conteneur::-webkit-scrollbar { width: 10px; }
-  .tableau-conteneur::-webkit-scrollbar-thumb { background: var(--bordure); border-radius: 5px; }
-  #tableau { width: 100%; border-collapse: collapse; background: var(--panneau); }
-  #tableau thead th {
-    position: sticky; top: 0; z-index: 5;
-    background: var(--vert-qc); color: #fff;
-    text-align: left; padding: 12px 16px;
-    font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
-    cursor: pointer; user-select: none;
-    border-right: 1px solid rgba(255,255,255,0.12);
-    transition: background 0.15s;
-  }
-  #tableau thead th:hover { background: #234a73; }
-  #tableau thead th::after { content: ' ⇅'; opacity: 0.4; font-size: 10px; }
-  #tableau thead th.tri-asc::after { content: ' ↑'; opacity: 1; }
-  #tableau thead th.tri-desc::after { content: ' ↓'; opacity: 1; }
-  #tableau tbody tr {
-    border-bottom: 1px solid var(--bordure);
-    cursor: pointer; transition: background 0.15s;
-  }
-  #tableau tbody tr:nth-child(even) { background: var(--fond); }
-  #tableau tbody tr:hover { background: #E8F0F8; }
-  #tableau td {
-    padding: 11px 16px; font-size: 12.5px; vertical-align: top;
-    border-right: 1px solid var(--bordure);
-  }
-  .td-numero { font-weight: 700; color: var(--vert-qc); white-space: nowrap; }
-  .td-titre { color: var(--encre); line-height: 1.35; }
-  .badge-type {
-    display: inline-block; padding: 3px 9px; border-radius: 4px;
-    font-size: 10.5px; font-weight: 700; color: #fff; white-space: nowrap;
-  }
-  .badge-them {
-    display: inline-flex; align-items: center; gap: 7px;
-    font-size: 12px; line-height: 1.3;
-  }
-  .badge-them .pastille { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
-  .td-niveau { color: var(--encre-doux); font-size: 12px; white-space: nowrap; }
-
-  .bloc-stats { display: flex; border-bottom: 1px solid var(--bordure); }
-  .stat {
-    flex: 1; padding: 16px 8px; text-align: center;
-    border-right: 1px solid var(--bordure);
-  }
-  .stat:last-child { border-right: none; }
-  .stat .chiffre { font-size: 27px; font-weight: 700; color: var(--vert-qc); line-height: 1; }
-  .stat .libelle {
-    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
-    color: var(--encre-doux); margin-top: 5px;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-  }
-
-  .section { padding: 18px 22px; border-bottom: 1px solid var(--bordure); }
-
-  /* Section recherche mise en avant en haut du panneau */
-  .section-recherche {
-    background: var(--fond);
-    padding: 16px 22px;
-  }
-  .section-recherche .recherche-boite input {
-    background: var(--panneau);
-    border: 1.5px solid var(--bordure);
-    font-size: 13.5px;
-  }
-  .section-recherche .recherche-boite input:focus {
-    border-color: var(--vert-clair);
-    box-shadow: 0 0 0 3px rgba(74, 123, 168, 0.15);
-  }
-  .section-titre {
-    font-size: 11px; letter-spacing: 1.8px; text-transform: uppercase;
-    color: var(--or); font-weight: 700; margin-bottom: 13px;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    display: flex; align-items: center; gap: 7px;
-  }
-  .section-titre::before {
-    content: ""; width: 14px; height: 1.5px;
-    background: var(--or); display: inline-block;
-  }
-
-  .recherche-boite { position: relative; }
-  .recherche-boite input {
-    width: 100%; padding: 11px 14px 11px 38px;
-    border: 1px solid var(--bordure); border-radius: 7px;
-    font-size: 14px; font-family: inherit;
-    background: var(--fond); color: var(--encre);
-    transition: border-color 0.18s, box-shadow 0.18s;
-  }
-  .recherche-boite input:focus {
-    outline: none; border-color: var(--vert-clair);
-    box-shadow: 0 0 0 3px rgba(107,144,113,0.15);
-  }
-  .recherche-boite .loupe {
-    position: absolute; left: 13px; top: 50%;
-    transform: translateY(-50%); color: var(--encre-doux); font-size: 15px;
-  }
-
-  .cascade-niveau { margin-bottom: 11px; }
-  .cascade-niveau:last-child { margin-bottom: 0; }
-  .cascade-label {
-    font-size: 11px; color: var(--encre-doux); margin-bottom: 5px;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .cascade-puce {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--vert-clair); flex-shrink: 0;
-  }
-  .cascade-niveau select {
-    width: 100%; padding: 9px 12px;
-    border: 1px solid var(--bordure); border-radius: 7px;
-    font-size: 13px; font-family: inherit;
-    background: var(--panneau); color: var(--encre); cursor: pointer;
-  }
-  .cascade-niveau select:focus { outline: none; border-color: var(--vert-clair); }
-  .cascade-trait { width: 1px; height: 9px; background: var(--bordure); margin-left: 3px; }
-
-  .categorie-ligne {
-    display: flex; align-items: center; padding: 8px 9px;
-    border-radius: 7px; cursor: pointer; margin-bottom: 3px;
-    transition: background 0.15s; position: relative;
-  }
-  .categorie-ligne:hover { background: var(--fond); }
-  .categorie-ligne input {
-    appearance: none; width: 17px; height: 17px;
-    border: 1.5px solid var(--bordure); border-radius: 4px;
-    margin-right: 10px; cursor: pointer; position: relative;
-    flex-shrink: 0; transition: all 0.15s;
-  }
-  .categorie-ligne input:checked {
-    background: var(--couleur-cat); border-color: var(--couleur-cat);
-  }
-  .categorie-ligne input:checked::after {
-    content: "✓"; position: absolute; color: white;
-    font-size: 11px; font-weight: 700;
-    top: 50%; left: 50%; transform: translate(-50%, -50%);
-  }
-  .categorie-pastille {
-    width: 11px; height: 11px; border-radius: 3px;
-    margin-right: 8px; flex-shrink: 0;
-  }
-  .categorie-nom { font-size: 13.5px; flex: 1; line-height: 1.25; }
-  .categorie-compte {
-    font-size: 11px; font-weight: 700; color: white;
-    padding: 2px 8px; border-radius: 9px;
-    font-family: 'Helvetica Neue', Arial, sans-serif; margin-left: 6px;
-  }
-  .info-icone {
-    width: 16px; height: 16px; border-radius: 50%;
-    border: 1.3px solid var(--encre-doux); color: var(--encre-doux);
-    font-size: 10px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    margin-left: 7px; flex-shrink: 0; cursor: help;
-    font-family: 'Helvetica Neue', Arial, sans-serif; transition: all 0.15s;
-  }
-  .info-icone:hover {
-    background: var(--vert-qc); border-color: var(--vert-qc); color: white;
-  }
-  .infobulle {
-    position: absolute; left: 50%; bottom: calc(100% + 9px);
-    transform: translateX(-50%) translateY(6px);
-    width: 256px; background: var(--vert-qc); color: #F1F4F8;
-    padding: 12px 14px; border-radius: 9px;
-    font-size: 12.5px; line-height: 1.5;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    box-shadow: 0 8px 28px rgba(31,71,51,0.32);
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.18s, transform 0.18s; z-index: 1500;
-  }
-  .infobulle::after {
-    content: ""; position: absolute; top: 100%; left: 50%;
-    transform: translateX(-50%);
-    border: 7px solid transparent; border-top-color: var(--vert-qc);
-  }
-  .infobulle .ib-titre {
-    font-weight: 700; margin-bottom: 4px; color: var(--vert-clair);
-    font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;
-  }
-  .info-icone:hover + .infobulle {
-    opacity: 1; transform: translateX(-50%) translateY(0);
-  }
-  .mini-actions { display: flex; gap: 7px; margin-bottom: 9px; }
-
-  /* Lignes de phase */
-  .phase-ligne {
-    display: flex; align-items: center; padding: 8px 9px;
-    border-radius: 7px; cursor: pointer; margin-bottom: 3px;
-    transition: background 0.15s;
-  }
-  .phase-ligne:hover { background: var(--fond); }
-  .phase-ligne input {
-    appearance: none; width: 17px; height: 17px;
-    border: 1.5px solid var(--bordure); border-radius: 4px;
-    margin-right: 10px; cursor: pointer; position: relative;
-    flex-shrink: 0; transition: all 0.15s;
-  }
-  .phase-ligne input:checked {
-    background: var(--couleur-ph); border-color: var(--couleur-ph);
-  }
-  .phase-ligne input:checked::after {
-    content: "✓"; position: absolute; color: white;
-    font-size: 11px; font-weight: 700;
-    top: 50%; left: 50%; transform: translate(-50%, -50%);
-  }
-  .phase-numero {
-    width: 20px; height: 20px; border-radius: 50%;
-    background: var(--couleur-ph); color: white;
-    font-size: 11px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    margin-right: 9px; flex-shrink: 0;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-  }
-  .phase-nom { font-size: 13.5px; flex: 1; line-height: 1.25; }
-  .phase-compte {
-    font-size: 11px; font-weight: 700; color: white;
-    padding: 2px 8px; border-radius: 9px;
-    font-family: 'Helvetica Neue', Arial, sans-serif; margin-left: 6px;
-    background: var(--couleur-ph);
-  }
-
-  /* Lignes de niveau de gouvernement */
-  .niveau-ligne {
-    display: flex; align-items: center; padding: 9px 10px;
-    border-radius: 7px; cursor: pointer; margin-bottom: 4px;
-    transition: background 0.15s;
-    border: 1px solid var(--bordure);
-  }
-  .niveau-ligne:hover { background: var(--fond); }
-  .niveau-ligne input {
-    appearance: none; width: 17px; height: 17px;
-    border: 1.5px solid var(--bordure); border-radius: 4px;
-    margin-right: 10px; cursor: pointer; position: relative;
-    flex-shrink: 0; transition: all 0.15s;
-  }
-  .niveau-ligne input:checked {
-    background: var(--couleur-niv); border-color: var(--couleur-niv);
-  }
-  .niveau-ligne input:checked::after {
-    content: "✓"; position: absolute; color: white;
-    font-size: 11px; font-weight: 700;
-    top: 50%; left: 50%; transform: translate(-50%, -50%);
-  }
-  .niveau-pastille {
-    width: 13px; height: 13px; border-radius: 3px;
-    margin-right: 9px; flex-shrink: 0;
-  }
-  .niveau-nom { font-size: 13.5px; flex: 1; line-height: 1.25; font-weight: 600; }
-  .niveau-compte {
-    font-size: 11px; font-weight: 700; color: white;
-    padding: 2px 8px; border-radius: 9px;
-    font-family: 'Helvetica Neue', Arial, sans-serif; margin-left: 6px;
-    background: var(--couleur-niv);
-  }
-  .mini-bouton {
-    flex: 1; padding: 6px; font-size: 10.5px;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase;
-    border: 1px solid var(--bordure); background: var(--panneau);
-    color: var(--encre-doux); border-radius: 6px; cursor: pointer;
-    transition: all 0.15s;
-  }
-  .mini-bouton:hover {
-    background: var(--vert-qc); color: white; border-color: var(--vert-qc);
-  }
-
-  .couche-ligne { display: flex; align-items: center; padding: 7px 0; }
-  .couche-ligne label {
-    display: flex; align-items: center; cursor: pointer;
-    font-size: 13px; flex: 1;
-  }
-  .interrupteur {
-    appearance: none; width: 38px; height: 21px;
-    background: var(--bordure); border-radius: 11px;
-    margin-right: 11px; cursor: pointer; position: relative;
-    transition: background 0.2s; flex-shrink: 0;
-  }
-  .interrupteur:checked { background: var(--vert-clair); }
-  .interrupteur::after {
-    content: ""; position: absolute;
-    width: 17px; height: 17px; background: white;
-    border-radius: 50%; top: 2px; left: 2px;
-    transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  }
-  .interrupteur:checked::after { left: 19px; }
-
-  .couche-trait-couleur {
-    display: inline-block;
-    width: 16px; height: 4px; border-radius: 2px;
-    margin-right: 7px; vertical-align: middle;
-  }
-
-  .pied {
-    padding: 14px 18px; background: var(--panneau);
-    border-top: 1px solid var(--bordure);
-  }
-  .pied-logos {
-    display: flex; align-items: center; justify-content: center;
-    gap: 14px; margin-bottom: 10px;
-  }
-  .logo-cadre {
-    flex: 1; height: 46px; max-width: 130px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 6px; overflow: hidden;
-  }
-  .logo-cadre img { max-height: 42px; max-width: 100%; object-fit: contain; }
-  /* Repli si le logo n'est pas encore déposé : cadre pointillé avec label */
-  .logo-cadre.logo-vide {
-    border: 1px dashed var(--bordure); background: var(--fond);
-  }
-  .logo-cadre.logo-vide::after {
-    content: attr(data-label);
-    font-size: 11px; font-weight: 700; color: var(--encre-doux);
-    letter-spacing: 1px; font-family: 'Helvetica Neue', Arial, sans-serif;
-  }
-  .pied-source {
-    font-size: 10px; color: var(--encre-doux);
-    text-align: center; line-height: 1.45;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-  }
-
-  .leaflet-container { background: #DDE3EC; }
-
-  .marqueur-perso {
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 600; font-family: 'Helvetica Neue', Arial, sans-serif;
-    color: white; border: 2px solid white; border-radius: 50%;
-    box-shadow: 0 1px 5px rgba(27,58,92,0.35); transition: transform 0.12s;
-    letter-spacing: -0.2px;
-  }
-  .marqueur-perso:hover { transform: scale(1.08); box-shadow: 0 2px 8px rgba(27,58,92,0.5); }
-
-  /* Marqueur en forme de goutte (pin) */
-  .marqueur-pin {
-    position: relative; display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-family: 'Helvetica Neue', Arial, sans-serif; color: #fff;
-    border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
-    border: 2px solid #fff; box-shadow: 0 3px 8px rgba(27,58,92,0.4);
-    transition: transform 0.15s;
-  }
-  .marqueur-pin span { transform: rotate(45deg); }
-  .marqueur-pin:hover { transform: rotate(-45deg) scale(1.1); }
-
-  #detail {
-    position: absolute; top: 18px; right: 18px;
-    width: 410px; max-height: calc(100vh - 36px);
-    background: var(--panneau); border-radius: 12px;
-    box-shadow: 0 12px 44px rgba(31,71,51,0.28);
-    display: none; flex-direction: column; z-index: 1200; overflow: hidden;
-  }
-  #detail.visible { display: flex; }
-  .detail-entete {
-    padding: 18px 20px; background: var(--vert-qc);
-    color: #F1F4F8; position: relative;
-  }
-  .detail-entete .d-surtitre {
-    font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase;
-    color: var(--vert-clair); font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 600;
-  }
-  .detail-entete h2 { font-size: 20px; margin-top: 5px; line-height: 1.2; }
-  .detail-entete .d-meta {
-    margin-top: 7px; font-size: 12px;
-    color: rgba(244,241,234,0.75); font-family: 'Helvetica Neue', Arial, sans-serif;
-  }
-  .fermer {
-    position: absolute; top: 14px; right: 14px;
-    width: 28px; height: 28px; border-radius: 50%;
-    background: rgba(244,241,234,0.18); border: none;
-    color: white; font-size: 17px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s;
-  }
-  .fermer:hover { background: rgba(244,241,234,0.32); }
-  .detail-corps { overflow-y: auto; padding: 8px 0; }
-  .detail-corps::-webkit-scrollbar { width: 8px; }
-  .detail-corps::-webkit-scrollbar-thumb { background: var(--bordure); border-radius: 4px; }
-  .groupe-cat { padding: 10px 20px 4px; }
-  .groupe-cat-titre {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
-    text-transform: uppercase; font-family: 'Helvetica Neue', Arial, sans-serif;
-    display: flex; align-items: center; gap: 7px; margin-bottom: 7px;
-  }
-  .groupe-cat-titre .gc-pastille { width: 10px; height: 10px; border-radius: 3px; }
-  .reglement-carte {
-    margin: 0 20px 9px; padding: 12px 14px;
-    background: var(--fond); border-left: 3px solid var(--couleur-r);
-    border-radius: 0 8px 8px 0;
-  }
-  .reglement-carte .r-numero {
-    font-size: 10.5px; font-weight: 700; color: var(--encre-doux);
-    font-family: 'Helvetica Neue', Arial, sans-serif; letter-spacing: 0.5px;
-  }
-  .reglement-carte .r-titre {
-    font-size: 13.5px; font-weight: 600;
-    margin: 4px 0 6px; line-height: 1.32;
-  }
-  .reglement-carte .r-resume {
-    font-size: 12px; color: var(--encre-doux);
-    line-height: 1.5; font-family: 'Helvetica Neue', Arial, sans-serif;
-  }
-  .reglement-carte .r-bas {
-    display: flex; align-items: center; gap: 8px;
-    margin-top: 8px; flex-wrap: wrap;
-  }
-  .etiq {
-    font-size: 10px; font-family: 'Helvetica Neue', Arial, sans-serif;
-    padding: 2px 7px; border-radius: 4px;
-    background: var(--bordure); color: var(--encre);
-  }
-  .r-lien {
-    font-size: 11px; color: var(--vert-qc); text-decoration: none;
-    font-weight: 600; font-family: 'Helvetica Neue', Arial, sans-serif;
-  }
-  .r-lien:hover { text-decoration: underline; }
-
-  /* Bandeau d'attributs (type, niveau, phase, catégorie) */
-  .r-attributs {
-    display: flex; flex-wrap: wrap; gap: 5px;
-    margin: 7px 0 9px;
-  }
-  .r-attributs .attr {
-    font-size: 10px; font-weight: 700;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    padding: 3px 9px; border-radius: 4px;
-    color: white; letter-spacing: 0.2px;
-  }
-  .r-attributs .attr-vide {
-    background: var(--fond); color: var(--encre-doux);
-    border: 1px solid var(--bordure); font-weight: 600;
-  }
-
-  .legende {
-    position: absolute; bottom: 20px; right: 20px;
-    background: var(--panneau); border-radius: 12px;
-    padding: 15px 17px; box-shadow: 0 8px 28px rgba(27,58,92,0.18);
-    z-index: 600; max-width: 290px;
-    max-height: calc(100% - 40px); overflow-y: auto;
-  }
-  .legende::-webkit-scrollbar { width: 6px; }
-  .legende::-webkit-scrollbar-thumb { background: var(--bordure); border-radius: 4px; }
-  .legende-titre {
-    font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase;
-    color: var(--or); font-weight: 700;
-    font-family: 'Helvetica Neue', Arial, sans-serif; margin-bottom: 11px;
-  }
-  /* Items de légende-clé avec définition dépliable */
-  .leg-item { margin: 2px 0; }
-  .leg-ligne {
-    display: flex; align-items: center; gap: 8px;
-    padding: 4px 0; font-size: 11.5px; position: relative;
-  }
-  .leg-pastille { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-  .leg-nom { flex: 1; line-height: 1.3; color: var(--encre); }
-  .leg-aide {
-    width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
-    border: 1.5px solid var(--bordure); background: var(--panneau);
-    color: var(--encre-doux); font-size: 11px; font-weight: 700;
-    cursor: help; line-height: 1; transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .leg-aide:hover { border-color: var(--vert-clair); color: #fff; background: var(--vert-clair); }
-  /* Infobulle affichée au SURVOL du ? */
-  .leg-def {
-    position: absolute; right: 26px; top: 50%; transform: translateY(-50%) translateX(8px);
-    width: 230px; background: var(--vert-qc); color: #fff;
-    padding: 11px 13px; border-radius: 9px;
-    font-size: 11px; line-height: 1.5;
-    box-shadow: 0 8px 26px rgba(27,58,92,0.32);
-    opacity: 0; visibility: hidden;
-    transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    z-index: 3000; pointer-events: none;
-  }
-  .leg-def::after {
-    content: ''; position: absolute; left: 100%; top: 50%;
-    transform: translateY(-50%);
-    border: 6px solid transparent; border-left-color: var(--vert-qc);
-  }
-  .leg-aide:hover + .leg-def { opacity: 1; visibility: visible; transform: translateY(-50%) translateX(0); }
-  .legende-note {
-    font-size: 11px; color: var(--encre-doux);
-    margin-top: 10px; padding-top: 10px;
-    border-top: 1px solid var(--bordure);
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    line-height: 1.4;
-  }
-
-  .indicateur {
-    position: absolute; top: 18px; left: 18px;
-    background: var(--panneau); padding: 9px 18px;
-    border-radius: 22px; box-shadow: 0 4px 16px var(--ombre);
-    z-index: 1100; font-size: 12.5px;
-    font-family: 'Helvetica Neue', Arial, sans-serif; color: var(--encre);
-  }
-  .indicateur strong { color: var(--vert-qc); }
-
-  .charge {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--panneau); padding: 18px 26px;
-    border-radius: 10px; box-shadow: 0 6px 22px var(--ombre);
-    z-index: 1100; font-size: 13px; color: var(--encre-doux);
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-  }
-
-  .etiquette-arr {
-    background: rgba(31,71,51,0.92); color: #F1F4F8;
-    border: none; border-radius: 5px;
-    padding: 4px 9px; font-size: 11px;
-    font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-  }
-  .etiquette-arr::before { border-top-color: rgba(31,71,51,0.92) !important; }
-  /* ===== ANIMATIONS FLUIDES ===== */
-  @keyframes apparition {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .puce-theme { animation: apparition 0.4s cubic-bezier(0.4,0,0.2,1) backwards; }
-  .puce-theme:nth-child(1) { animation-delay: 0.02s; }
-  .puce-theme:nth-child(2) { animation-delay: 0.06s; }
-  .puce-theme:nth-child(3) { animation-delay: 0.10s; }
-  .puce-theme:nth-child(4) { animation-delay: 0.14s; }
-  .puce-theme:nth-child(5) { animation-delay: 0.18s; }
-  .puce-theme:nth-child(6) { animation-delay: 0.22s; }
-
-  @keyframes glisse-vue {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .vue.active { animation: glisse-vue 0.35s cubic-bezier(0.4,0,0.2,1); }
-
-  /* La carte garde sa propre transition (pas d'animation qui casse Leaflet) */
-  #vue-carte.active { animation: none; }
-
-  /* Détail qui apparaît en douceur */
-  #detail {
-    transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
-  }
-
-  /* Lignes du tableau : légère apparition */
-  #tableau tbody tr { animation: apparition 0.3s ease backwards; }
-
-  /* Marqueurs : pulsation douce à l'apparition */
-  @keyframes pop-marqueur {
-    0% { transform: rotate(-45deg) scale(0); }
-    70% { transform: rotate(-45deg) scale(1.12); }
-    100% { transform: rotate(-45deg) scale(1); }
-  }
-
-  /* Scroll fluide partout */
-  * { scroll-behavior: smooth; }
-
+/* Animations */
+@keyframes apparition{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.theme-card{animation:apparition 0.35s cubic-bezier(0.4,0,0.2,1) backwards}
+.theme-card:nth-child(1){animation-delay:0.03s}.theme-card:nth-child(2){animation-delay:0.07s}
+.theme-card:nth-child(3){animation-delay:0.11s}.theme-card:nth-child(4){animation-delay:0.15s}
+.theme-card:nth-child(5){animation-delay:0.19s}.theme-card:nth-child(6){animation-delay:0.23s}
 </style>
 </head>
 <body>
-<div id="app">
 
-  <!-- ===== BARRE DU HAUT ===== -->
-  <header id="barre-haut">
-    <div class="bh-rangee-1">
-      <div class="bh-gauche">
-        <div class="bh-logos">
-          <div class="bh-logo" title="École de technologie supérieure">
-            <img src="logo_ets.png" alt="ÉTS"
-                 onerror="this.style.display='none';this.parentNode.classList.add('logo-vide');this.parentNode.setAttribute('data-label','ÉTS');">
-          </div>
-          <div class="bh-logo" title="GRIDD">
-            <img src="logo_gridd.png" alt="GRIDD"
-                 onerror="this.style.display='none';this.parentNode.classList.add('logo-vide');this.parentNode.setAttribute('data-label','GRIDD');">
-          </div>
-        </div>
-        <div class="bh-titre">
-          <div class="bh-surtitre">Cartographie réglementaire</div>
-          <div class="bh-nom">Règlements de construction — Région de Québec</div>
-        </div>
-      </div>
-      <div class="bh-centre"></div>
-      <div class="bh-droite">
-        <div class="bascule" id="bascule">
-          <button class="bascule-opt actif" data-vue="carte">Carte</button>
-          <button class="bascule-opt" data-vue="liste">Liste</button>
-        </div>
-      </div>
+<!-- BARRE DU HAUT -->
+<header id="barre-haut">
+  <div class="bh-logos">
+    <div class="bh-logo" title="École de technologie supérieure">
+      <img src="logo_ets.png" alt="ÉTS" onerror="this.style.display='none';this.parentNode.classList.add('logo-vide');this.parentNode.setAttribute('data-label','ÉTS')">
     </div>
-  </header>
+    <div class="bh-logo" title="GRIDD">
+      <img src="logo_gridd.png" alt="GRIDD" onerror="this.style.display='none';this.parentNode.classList.add('logo-vide');this.parentNode.setAttribute('data-label','GRIDD')">
+    </div>
+  </div>
+  <div class="bh-sep"></div>
+  <div class="bh-titre">
+    <div class="bh-surtitre">Cartographie réglementaire</div>
+    <div class="bh-nom">Règlements de construction — Région de Québec</div>
+  </div>
+  <div class="bh-droite">
+    <div class="bh-recherche">
+      <span class="loupe">⌕</span>
+      <input type="text" id="recherche" placeholder="Rechercher un règlement...">
+    </div>
+    <div class="bascule" id="bascule">
+      <button class="bascule-opt actif" data-vue="carte">Carte</button>
+      <button class="bascule-opt" data-vue="liste">Liste</button>
+    </div>
+    <button class="btn-filtres" id="btn-ouvrir-filtres">
+      <span class="filtre-icone">⚙</span>
+      Filtres
+      <span class="filtre-badge" id="badge-filtres">6</span>
+    </button>
+  </div>
+</header>
 
-  <!-- ===== CORPS ===== -->
-  <div id="corps">
-    <!-- PANNEAU DE GAUCHE (démarche guidée) -->
-    <aside id="panneau-gauche">
-      <!-- Réinitialiser -->
-      <button id="btn-reinit">↺ Réinitialiser les filtres</button>
+<!-- CORPS -->
+<div id="corps">
+  <!-- VUE CARTE -->
+  <div id="vue-carte" class="vue active">
+    <div id="carte"></div>
+    <div class="charge" id="charge">Chargement des frontières…</div>
 
-      <!-- Recherche -->
-      <div class="pg-recherche">
-        <span class="loupe">⌕</span>
-        <input type="text" id="recherche" placeholder="Rechercher un règlement...">
+    <!-- Légende -->
+    <div class="legende">
+      <div class="legende-titre">Thématiques de conformité</div>
+      <div id="legende-categories"></div>
+      <div class="legende-note">Du clair au foncé : ordre du cycle de vie d'un projet.</div>
+    </div>
+
+    <!-- Panneau détail -->
+    <div id="detail">
+      <div class="detail-entete">
+        <button class="fermer" id="fermer-detail">×</button>
+        <div class="d-surtitre" id="detail-surtitre">Document</div>
+        <h2 id="detail-titre">—</h2>
+        <div class="d-meta" id="detail-meta">—</div>
       </div>
+      <div class="detail-corps" id="detail-corps"></div>
+    </div>
 
-      <!-- Section Sélection géographique -->
-      <div class="pg-section">
-        <button class="pg-titre-section" data-cible="sec-territoire">
-          <span>Sélection géographique</span><span class="pg-chevron">▾</span>
-        </button>
-        <div class="pg-contenu ouvert" id="sec-territoire">
-          <div class="cascade-v">
-            <div class="cv-niveau">
-              <span class="cv-titre"><span class="cv-num">1</span>Province</span>
-              <select id="f-province" class="cv-select"><option value="Québec">Québec</option></select>
-            </div>
-            <div class="cv-lien"></div>
-            <div class="cv-niveau">
-              <span class="cv-titre"><span class="cv-num">2</span>MRC / Communauté</span>
-              <select id="f-mrc" class="cv-select"><option value="__tous__">CMQ — Communauté métropolitaine</option></select>
-            </div>
-            <div class="cv-lien"></div>
-            <div class="cv-niveau">
-              <span class="cv-titre"><span class="cv-num">3</span>Agglomération</span>
-              <select id="f-agglo" class="cv-select"><option value="Agglomération de Québec">Agglomération de Québec</option></select>
-            </div>
-            <div class="cv-lien"></div>
-            <div class="cv-niveau">
-              <span class="cv-titre"><span class="cv-num">4</span>Arrondissement</span>
-              <select id="f-arr" class="cv-select"><option value="__tous__">Tous les arrondissements</option></select>
-            </div>
+    <!-- Bouton couches -->
+    <button id="btn-layers" title="Couches de la carte">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
+    </button>
+    <div id="panneau-layers">
+      <div class="pl-titre">Couches territoriales</div>
+      <div class="couche-ligne"><label><input type="checkbox" class="interrupteur" id="couche-province"><span><span class="couche-trait-couleur" style="background:#7B3F8F"></span>Province de Québec</span></label></div>
+      <div class="couche-ligne"><label><input type="checkbox" class="interrupteur" id="couche-cmq"><span><span class="couche-trait-couleur" style="background:#2E6B9E"></span>Communauté métropolitaine</span></label></div>
+      <div class="couche-ligne"><label><input type="checkbox" class="interrupteur" id="couche-ville"><span><span class="couche-trait-couleur" style="background:#1B7A5A"></span>Ville de Québec</span></label></div>
+      <div class="couche-ligne"><label><input type="checkbox" class="interrupteur" id="couche-arr" checked><span><span class="couche-trait-couleur" style="background:#C77D2E"></span>Arrondissements</span></label></div>
+      <div class="couche-ligne" style="margin-top:8px;border-top:1px solid #EDF2F7;padding-top:9px"><label><input type="checkbox" class="interrupteur" id="couche-reg" checked><span>Marqueurs des règlements</span></label></div>
+      <div id="couches-statut" style="font-size:10.5px;color:#A0AEC0;margin-top:8px"></div>
+    </div>
+  </div>
+
+  <!-- VUE LISTE -->
+  <div id="vue-liste" class="vue">
+    <div class="liste-entete">
+      <span id="liste-compte">0 résultats</span>
+      <span class="liste-hint">Cliquez sur un en-tête pour trier</span>
+    </div>
+    <div class="tableau-conteneur">
+      <table id="tableau">
+        <thead>
+          <tr>
+            <th data-tri="numero" style="width:13%">Numéro</th>
+            <th data-tri="titre" style="width:37%">Titre</th>
+            <th data-tri="type" style="width:11%">Type</th>
+            <th data-tri="niveau" style="width:15%">Niveau</th>
+            <th data-tri="categorie" style="width:24%">Thématique</th>
+          </tr>
+        </thead>
+        <tbody id="tableau-corps"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY FILTRES (panneau droit flottant) -->
+<div id="overlay-filtres">
+  <div id="panneau-filtres">
+    <div class="pf-entete">
+      <span class="pf-titre">Filtres</span>
+      <button class="pf-fermer" id="btn-fermer-filtres">×</button>
+    </div>
+    <button id="btn-reinit">↺ Réinitialiser les filtres</button>
+    <div class="pf-corps">
+      <!-- Territoire -->
+      <div class="pf-section">
+        <div class="pf-section-titre">Sélection géographique</div>
+        <div class="cascade-v">
+          <div class="cv-niveau">
+            <span class="cv-titre"><span class="cv-num">1</span>Province</span>
+            <select id="f-province" class="cv-select"><option value="Québec">Québec</option></select>
+          </div>
+          <div class="cv-lien"></div>
+          <div class="cv-niveau">
+            <span class="cv-titre"><span class="cv-num">2</span>MRC / Communauté</span>
+            <select id="f-mrc" class="cv-select"><option value="__tous__">CMQ — Communauté métropolitaine</option></select>
+          </div>
+          <div class="cv-lien"></div>
+          <div class="cv-niveau">
+            <span class="cv-titre"><span class="cv-num">3</span>Agglomération</span>
+            <select id="f-agglo" class="cv-select"><option value="Agglomération de Québec">Agglomération de Québec</option></select>
+          </div>
+          <div class="cv-lien"></div>
+          <div class="cv-niveau">
+            <span class="cv-titre"><span class="cv-num">4</span>Arrondissement</span>
+            <select id="f-arr" class="cv-select"><option value="__tous__">Tous les arrondissements</option></select>
           </div>
         </div>
       </div>
-
-      <!-- Section Filtre principal : thématiques -->
-      <div class="pg-section">
-        <button class="pg-titre-section" data-cible="sec-themes">
-          <span>Filtre principal · Thématique</span><span class="pg-chevron">▾</span>
-        </button>
-        <div class="pg-contenu ouvert" id="sec-themes">
-          <p class="pg-aide">Cliquez sur une thématique pour l'activer ou la désactiver.</p>
-          <div id="liste-categories" class="puces-v"></div>
-        </div>
+      <!-- Thématiques -->
+      <div class="pf-section">
+        <div class="pf-section-titre">Filtre thématique</div>
+        <div id="liste-categories" class="themes-grille"></div>
       </div>
-
       <!-- Sélection active -->
-      <div class="pg-section">
+      <div class="pf-section">
         <div class="sel-active">
           <div class="sel-titre">Sélection active</div>
           <div class="sel-geo" id="sel-geo">Québec › CMQ › Agglomération › Tous</div>
@@ -1082,83 +489,16 @@
           <div class="sel-compte"><strong id="sel-compte-n">0</strong> documents affichés</div>
         </div>
       </div>
-
       <!-- Export -->
-      <div class="pg-section pg-export">
-        <div class="pg-titre-export">Exporter la liste</div>
+      <div class="pf-section">
+        <div class="pf-titre-export">Exporter la liste</div>
         <div class="export-boutons">
           <button class="export-btn" id="export-pdf">PDF</button>
           <button class="export-btn" id="export-excel">Excel</button>
           <button class="export-btn" id="export-csv">CSV</button>
         </div>
       </div>
-    </aside>
-
-    <!-- ZONE CENTRALE : carte OU liste -->
-    <main id="zone-centrale">
-      <!-- VUE CARTE -->
-      <div id="vue-carte" class="vue active">
-        <div id="carte"></div>
-        <div class="charge" id="charge">Chargement des frontières des arrondissements…</div>
-
-        <!-- Bouton couches flottant (bas gauche) -->
-        <button id="btn-layers" title="Couches de la carte">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-            <polyline points="2 17 12 22 22 17"></polyline>
-            <polyline points="2 12 12 17 22 12"></polyline>
-          </svg>
-        </button>
-        <div id="panneau-layers">
-          <div class="pl-titre">Couches territoriales</div>
-          <div class="couche-ligne"><label><input type="checkbox" class="interrupteur" id="couche-province"><span><span class="couche-trait-couleur" style="background:#7B3F8F"></span>Province de Québec</span></label></div>
-          <div class="couche-ligne"><label><input type="checkbox" class="interrupteur" id="couche-cmq"><span><span class="couche-trait-couleur" style="background:#2E6B9E"></span>Communauté métropolitaine</span></label></div>
-          <div class="couche-ligne"><label><input type="checkbox" class="interrupteur" id="couche-ville"><span><span class="couche-trait-couleur" style="background:#1B7A5A"></span>Ville de Québec</span></label></div>
-          <div class="couche-ligne"><label><input type="checkbox" class="interrupteur" id="couche-arr" checked><span><span class="couche-trait-couleur" style="background:#C77D2E"></span>Arrondissements</span></label></div>
-          <div class="couche-ligne" style="margin-top:6px;border-top:1px solid var(--bordure);padding-top:9px;"><label><input type="checkbox" class="interrupteur" id="couche-reg" checked><span>Marqueurs des règlements</span></label></div>
-          <div id="couches-statut" style="font-size:10.5px;color:var(--encre-doux);margin-top:8px;"></div>
-        </div>
-
-        <div class="legende">
-          <div class="legende-titre">Thématiques de conformité</div>
-          <div id="legende-categories"></div>
-          <div class="legende-note">
-            Du clair au foncé : ordre chronologique dans le cycle de vie d'un projet.
-          </div>
-        </div>
-        <div id="detail">
-          <div class="detail-entete">
-            <button class="fermer" id="fermer-detail">×</button>
-            <div class="d-surtitre" id="detail-surtitre">Arrondissement</div>
-            <h2 id="detail-titre">—</h2>
-            <div class="d-meta" id="detail-meta">—</div>
-          </div>
-          <div class="detail-corps" id="detail-corps"></div>
-        </div>
-      </div>
-
-      <!-- VUE LISTE -->
-      <div id="vue-liste" class="vue">
-        <div class="liste-entete">
-          <span id="liste-compte">0 résultats</span>
-          <span class="liste-hint">Cliquez sur un en-tête pour trier</span>
-        </div>
-        <div class="tableau-conteneur">
-          <table id="tableau">
-            <thead>
-              <tr>
-                <th data-tri="numero" style="width:13%">Numéro</th>
-                <th data-tri="titre" style="width:37%">Titre</th>
-                <th data-tri="type" style="width:11%">Type</th>
-                <th data-tri="niveau" style="width:15%">Niveau</th>
-                <th data-tri="categorie" style="width:24%">Thématique</th>
-              </tr>
-            </thead>
-            <tbody id="tableau-corps"></tbody>
-          </table>
-        </div>
-      </div>
-    </main>
+    </div>
   </div>
 </div>
 
@@ -1560,43 +900,6 @@ document.getElementById('fermer-detail').addEventListener('click', () => {
 });
 
 /* ===== RAFRAÎCHIR ===== */
-function rafraichir() {
-  const regs = reglementsFiltres();
-  dessinerProvince();
-  dessinerCMQ();
-  dessinerVille();
-  dessinerArrondissements(regs);
-  dessinerMarqueurs(regs);
-  const compteEl = document.getElementById('bb-compte');
-  if (compteEl) compteEl.textContent =
-    `${regs.length} document${regs.length > 1 ? 's' : ''} affiché${regs.length > 1 ? 's' : ''}`;
-  majSelectionActive(regs.length);
-  reglementsCourants = regs;
-  remplirTableau(regs);
-}
-
-/* Garde la liste filtrée courante pour l'export */
-let reglementsCourants = [];
-
-/* Met à jour le bloc "Sélection active" */
-function majSelectionActive(n) {
-  const arr = etat.arrondissement === '__tous__' ? 'Tous les arrondissements' : etat.arrondissement;
-  const geoEl = document.getElementById('sel-geo');
-  if (geoEl) geoEl.textContent = `Québec › CMQ › Agglomération › ${arr}`;
-  const themesEl = document.getElementById('sel-themes');
-  if (themesEl) {
-    const total = Object.keys(DONNEES.categories).length;
-    const actives = etat.categories.size;
-    if (actives === total) themesEl.textContent = 'Toutes les thématiques';
-    else if (actives === 0) themesEl.textContent = 'Aucune thématique sélectionnée';
-    else {
-      const noms = [...etat.categories].map(c => DONNEES.categories[c].nom);
-      themesEl.textContent = actives <= 2 ? noms.join(' · ') : `${actives} thématiques sélectionnées`;
-    }
-  }
-  const compteN = document.getElementById('sel-compte-n');
-  if (compteN) compteN.textContent = n;
-}
 
 /* ===== VUE LISTE : remplissage et tri du tableau ===== */
 let triColonne = null, triSens = 1;
@@ -1663,92 +966,7 @@ function echapper(txt) {
 }
 
 /* ===== INITIALISATION DES FILTRES ===== */
-function initFiltres() {
-  const selArr = document.getElementById('f-arr');
-  Object.values(ID_VERS_ARRONDISSEMENT).sort().forEach(nom => {
-    const opt = document.createElement('option');
-    opt.value = nom; opt.textContent = nom;
-    selArr.appendChild(opt);
-  });
-
-  const cont = document.getElementById('liste-categories');
-  Object.entries(DONNEES.categories).forEach(([cle, info]) => {
-    const compte = DONNEES.statistiques.par_categorie[cle] || 0;
-    const puce = document.createElement('div');
-    puce.className = 'puce-theme active';
-    puce.setAttribute('data-cat', cle);
-    puce.style.background = info.couleur;
-    puce.style.borderColor = info.couleur;
-    puce.innerHTML = `
-      <span class="pt-pastille" style="background:#fff"></span>
-      <span class="pt-nom">${info.nom}</span>
-      <span class="pt-compte">${compte}</span>`;
-    cont.appendChild(puce);
-
-    // Clic sur la puce = activer/désactiver
-    puce.addEventListener('click', () => {
-      const actif = puce.classList.toggle('active');
-      if (actif) {
-        etat.categories.add(cle);
-        puce.style.background = info.couleur;
-        puce.style.borderColor = info.couleur;
-      } else {
-        etat.categories.delete(cle);
-        puce.style.background = '';
-        puce.style.borderColor = '';
-      }
-      rafraichir();
-    });
-  });
-
-  /* Légende-clé : les 6 thématiques avec définition dépliable (?) */
-  const legCont = document.getElementById('legende-categories');
-  if (legCont) {
-    Object.values(DONNEES.categories).forEach(info => {
-      const item = document.createElement('div');
-      item.className = 'leg-item';
-      item.innerHTML = `
-        <div class="leg-ligne">
-          <span class="leg-pastille" style="background:${info.couleur}"></span>
-          <span class="leg-nom">${info.nom}</span>
-          <span class="leg-aide" title="Définition">?</span>
-          <span class="leg-def">${info.definition}</span>
-        </div>`;
-      legCont.appendChild(item);
-    });
-  }
-}
-
-/* Réactive l'affichage visuel de toutes les puces */
-function majPucesThemes(actives) {
-  document.querySelectorAll('.puce-theme').forEach(p => {
-    const cle = p.getAttribute('data-cat');
-    const info = DONNEES.categories[cle];
-    if (actives) {
-      p.classList.add('active');
-      p.style.background = info.couleur; p.style.borderColor = info.couleur;
-    } else {
-      p.classList.remove('active');
-      p.style.background = ''; p.style.borderColor = '';
-    }
-  });
-}
-
 /* ===== ÉVÉNEMENTS ===== */
-document.getElementById('recherche').addEventListener('input', (e) => {
-  etat.recherche = e.target.value.toLowerCase().trim();
-  rafraichir();
-});
-document.getElementById('f-arr').addEventListener('change', (e) => {
-  etat.arrondissement = e.target.value;
-  if (e.target.value !== '__tous__') {
-    const c = centroidesArrondissements()[e.target.value];
-    if (c) carte.setView([c.lat, c.lng], 12);
-  } else {
-    carte.setView([46.83, -71.30], 11);
-  }
-  rafraichir();
-});
 document.getElementById('couche-arr').addEventListener('change', (e) => {
   etat.coucheArr = e.target.checked; rafraichir();
 });
@@ -1766,8 +984,6 @@ document.getElementById('couche-ville').addEventListener('change', (e) => {
 });
 
 /* ===== DÉMARRAGE ===== */
-initFiltres();
-initTriTableau();
 
 /* --- Sections repliables du panneau de gauche --- */
 document.querySelectorAll('.pg-titre-section').forEach(btn => {
@@ -1960,6 +1176,243 @@ fetch(URL_PROVINCE)
     majStatut();
   })
   .catch(() => { statutCouches.prov = 'echec'; majStatut(); });
+
+
+/* ══════════════════════════════════════════════════
+   THÉMATIQUES AVEC ICÔNES ET COULEURS VARIÉES
+══════════════════════════════════════════════════ */
+const ICONES_THEMES = {
+  'territoire_environnement':    { icone:'🌿', couleur:'#2D8B6F', fond:'#E8F7F2' },
+  'planification_zonage_permis': { icone:'📐', couleur:'#2563A8', fond:'#EBF3FB' },
+  'codes_normes_construction':   { icone:'🔧', couleur:'#6B4BB0', fond:'#F0ECFB' },
+  'sante_securite_travail':      { icone:'🛡️', couleur:'#C0392B', fond:'#FDECEA' },
+  'approvisionnement_contrats':  { icone:'📋', couleur:'#D4720A', fond:'#FEF3E7' },
+  'exploitation_fin_de_vie':     { icone:'♻️', couleur:'#1E7A4A', fond:'#E8F7EE' },
+};
+
+/* ══ INITFILTRES (remplace l'originale) ══ */
+function initFiltres() {
+  // Arrondissements
+  const selArr = document.getElementById('f-arr');
+  Object.values(ID_VERS_ARRONDISSEMENT).sort().forEach(nom => {
+    const opt = document.createElement('option');
+    opt.value = nom; opt.textContent = nom;
+    selArr.appendChild(opt);
+  });
+  // Thématiques en cards avec icônes
+  const cont = document.getElementById('liste-categories');
+  Object.entries(DONNEES.categories).forEach(([cle, info]) => {
+    const compte = DONNEES.statistiques.par_categorie[cle] || 0;
+    const ic = ICONES_THEMES[cle] || { icone:'📄', couleur:'#4A5568', fond:'#F7FAFC' };
+    const card = document.createElement('div');
+    card.className = 'theme-card active';
+    card.setAttribute('data-cat', cle);
+    card.style.background = ic.fond;
+    card.innerHTML = `
+      <div class="theme-icone">${ic.icone}</div>
+      <div class="theme-info">
+        <div class="theme-nom" style="color:${ic.couleur}">${info.nom}</div>
+        <div class="theme-compte" style="color:${ic.couleur}">${compte} documents</div>
+      </div>
+      <div class="theme-check" style="border-color:${ic.couleur};background:${ic.couleur}"></div>`;
+    cont.appendChild(card);
+    card.addEventListener('click', () => {
+      const actif = card.classList.toggle('active');
+      const check = card.querySelector('.theme-check');
+      if (actif) {
+        etat.categories.add(cle);
+        card.style.background = ic.fond;
+        check.style.background = ic.couleur;
+        check.style.borderColor = ic.couleur;
+      } else {
+        etat.categories.delete(cle);
+        card.style.background = '';
+        check.style.background = 'transparent';
+        check.style.borderColor = '#CBD5E0';
+      }
+      majBadgeFiltres();
+      rafraichir();
+    });
+  });
+  // Légende avec icônes
+  const legCont = document.getElementById('legende-categories');
+  if (legCont) {
+    Object.entries(DONNEES.categories).forEach(([cle, info]) => {
+      const ic = ICONES_THEMES[cle] || { icone:'📄', couleur:'#4A5568', fond:'#F7FAFC' };
+      const item = document.createElement('div');
+      item.className = 'leg-item';
+      item.innerHTML = `
+        <div class="leg-ligne">
+          <span class="leg-icone">${ic.icone}</span>
+          <span class="leg-nom">${info.nom}</span>
+          <span class="leg-aide" title="Définition">?</span>
+          <span class="leg-def">${info.definition}</span>
+        </div>`;
+      legCont.appendChild(item);
+    });
+  }
+  // Événements filtres geo
+  document.getElementById('f-arr').addEventListener('change', (e) => {
+    etat.arrondissement = e.target.value;
+    if (e.target.value !== '__tous__') {
+      const c = centroidesArrondissements()[e.target.value];
+      if (c) carte.setView([c.lat, c.lng], 12);
+    } else { carte.setView([46.83, -71.30], 11); }
+    rafraichir();
+  });
+  document.getElementById('recherche').addEventListener('input', (e) => {
+    etat.recherche = e.target.value.toLowerCase().trim();
+    rafraichir();
+  });
+}
+
+function majBadgeFiltres() {
+  const badge = document.getElementById('badge-filtres');
+  if (badge) badge.textContent = etat.categories.size;
+}
+
+/* ══ RAFRAICHIR (avec sélection active + exports) ══ */
+let reglementsCourants = [];
+
+function majSelectionActive(n) {
+  const arr = etat.arrondissement === '__tous__' ? 'Tous les arrondissements' : etat.arrondissement;
+  const geoEl = document.getElementById('sel-geo');
+  if (geoEl) geoEl.textContent = `Québec › CMQ › Agglomération › ${arr}`;
+  const themesEl = document.getElementById('sel-themes');
+  if (themesEl) {
+    const total = Object.keys(DONNEES.categories).length;
+    const actives = etat.categories.size;
+    if (actives === total) themesEl.textContent = 'Toutes les thématiques';
+    else if (actives === 0) themesEl.textContent = 'Aucune thématique';
+    else themesEl.textContent = `${actives} thématiques sélectionnées`;
+  }
+  const compteN = document.getElementById('sel-compte-n');
+  if (compteN) compteN.textContent = n;
+}
+
+function rafraichir() {
+  const regs = reglementsFiltres();
+  dessinerProvince(); dessinerCMQ(); dessinerVille();
+  dessinerArrondissements(regs); dessinerMarqueurs(regs);
+  majSelectionActive(regs.length);
+  reglementsCourants = regs;
+  remplirTableau(regs);
+}
+
+/* ══ PANNEAU FILTRES FLOTTANT ══ */
+const overlayFiltres = document.getElementById('overlay-filtres');
+document.getElementById('btn-ouvrir-filtres').addEventListener('click', () => {
+  overlayFiltres.classList.add('ouvert');
+});
+document.getElementById('btn-fermer-filtres').addEventListener('click', () => {
+  overlayFiltres.classList.remove('ouvert');
+});
+overlayFiltres.addEventListener('click', (e) => {
+  if (e.target === overlayFiltres) overlayFiltres.classList.remove('ouvert');
+});
+
+/* ══ RÉINITIALISER ══ */
+document.getElementById('btn-reinit').addEventListener('click', () => {
+  etat.categories = new Set(Object.keys(DONNEES.categories));
+  etat.arrondissement = '__tous__';
+  etat.recherche = '';
+  document.getElementById('f-arr').value = '__tous__';
+  document.getElementById('recherche').value = '';
+  document.querySelectorAll('.theme-card').forEach(card => {
+    const cle = card.getAttribute('data-cat');
+    const ic = ICONES_THEMES[cle] || { couleur:'#4A5568', fond:'#F7FAFC' };
+    card.classList.add('active');
+    card.style.background = ic.fond;
+    const check = card.querySelector('.theme-check');
+    if (check) { check.style.background = ic.couleur; check.style.borderColor = ic.couleur; }
+  });
+  majBadgeFiltres();
+  if (carte && carte.setView) carte.setView([46.83, -71.30], 11);
+  rafraichir();
+});
+
+/* ══ BASCULE CARTE/LISTE ══ */
+document.querySelectorAll('.bascule-opt').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.classList.contains('actif')) return;
+    document.querySelectorAll('.bascule-opt').forEach(b => b.classList.remove('actif'));
+    btn.classList.add('actif');
+    const vue = btn.getAttribute('data-vue');
+    document.getElementById('vue-carte').classList.toggle('active', vue === 'carte');
+    document.getElementById('vue-liste').classList.toggle('active', vue === 'liste');
+    if (vue === 'carte' && carte && carte.invalidateSize) setTimeout(() => carte.invalidateSize(), 320);
+  });
+});
+
+/* ══ BOUTON COUCHES ══ */
+const btnLayersEl = document.getElementById('btn-layers');
+const panneauLayersEl = document.getElementById('panneau-layers');
+btnLayersEl.addEventListener('click', (e) => {
+  e.stopPropagation();
+  panneauLayersEl.classList.toggle('ouvert');
+  btnLayersEl.classList.toggle('actif');
+});
+document.addEventListener('click', (e) => {
+  if (!panneauLayersEl.contains(e.target) && e.target !== btnLayersEl) {
+    panneauLayersEl.classList.remove('ouvert');
+    btnLayersEl.classList.remove('actif');
+  }
+});
+
+/* ══ EXPORTS ══ */
+function donneesExport() {
+  return reglementsCourants.map(r => ({
+    Numero: r.reglement.numero||'', Titre: r.reglement.titre||'',
+    Type: r.type_document||'Règlement', Niveau: r.niveau_gouvernement||'',
+    Thematique: r.categorie_nom||''
+  }));
+}
+function telecharger(contenu, nom, type) {
+  const blob = new Blob([contenu], {type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=nom;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+function echapCSV(v) {
+  v = String(v==null?'':v);
+  return /[",\\n;]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;
+}
+document.getElementById('export-csv').addEventListener('click', () => {
+  const lignes = donneesExport();
+  if (!lignes.length) { alert('Aucun document à exporter.'); return; }
+  const entetes = Object.keys(lignes[0]);
+  const csv = '\\ufeff'+[entetes.join(';')].concat(lignes.map(l=>entetes.map(e=>echapCSV(l[e])).join(';'))).join('\\n');
+  telecharger(csv, 'reglements_quebec.csv', 'text/csv;charset=utf-8');
+});
+document.getElementById('export-excel').addEventListener('click', () => {
+  const lignes = donneesExport();
+  if (!lignes.length) { alert('Aucun document à exporter.'); return; }
+  const entetes = Object.keys(lignes[0]);
+  let h='<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body><table border="1"><tr>';
+  h+=entetes.map(e=>`<th>${e}</th>`).join('')+'</tr>';
+  lignes.forEach(l=>{h+='<tr>'+entetes.map(e=>`<td>${echapper(l[e])}</td>`).join('')+'</tr>';});
+  h+='</table></body></html>';
+  telecharger(h, 'reglements_quebec.xls', 'application/vnd.ms-excel');
+});
+document.getElementById('export-pdf').addEventListener('click', () => {
+  const lignes = donneesExport();
+  if (!lignes.length) { alert('Aucun document à exporter.'); return; }
+  if (window.jspdf && window.jspdf.jsPDF) {
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF({orientation:'landscape'});
+    doc.setFontSize(13); doc.text('Règlements de construction — Région de Québec', 14, 15);
+    doc.setFontSize(9); doc.text(`${lignes.length} documents`, 14, 21);
+    if (doc.autoTable) doc.autoTable({startY:26,styles:{fontSize:7},headStyles:{fillColor:[43,108,176]},head:[Object.keys(lignes[0])],body:lignes.map(l=>Object.values(l))});
+    doc.save('reglements_quebec.pdf');
+  } else { window.print(); }
+});
+
+/* ══ DÉMARRAGE ══ */
+initFiltres();
+initTriTableau();
+
 </script>
 </body>
 </html>
